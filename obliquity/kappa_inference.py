@@ -10,9 +10,12 @@ from numpy import pi
 from scipy.special import erf
 from scipy.interpolate import LinearNDInterpolator as interpnd
 
-import simpledist.distributions as dists
+import pandas as pd
 
-from .sini_inference_fns import cosi_integrand
+from pkg_resources import resource_filename
+
+from sini_inference_fns import cosi_integrand
+from simpledist import distributions as dists
 
 def fisher(x,k):
     """Fisher distribution 
@@ -114,10 +117,6 @@ def cosi_posterior(vsini_dist,veq_dist,vgrid=None,npts=100,vgrid_pts=1000):
     Ls /= np.trapz(Ls,cs)
     return cs,Ls
 
-class Cosi_Distribution(dists.Distribution):
-    """A Distribution for cos(I*) given vsini and veq measurements
-    """
-    
 
 def sample_posterior(x,post,nsamples=1):
     """ Returns nsamples from a tabulated posterior (not necessarily normalized)
@@ -166,7 +165,6 @@ def cosi_samples_from_posteriors(vsini_posts,veq_posts,nsamples=100,vsini_upperl
     N = len(vsini_posts)
     for i,vsini_post,veq_post in zip(np.arange(len(vsini_posts)),
                                      vsini_posts,veq_posts):
-        #print '%i of %i' % (i+1,N)
         samples[i,:] = cosi_samples(vsini_dist=vsini_post,
                                     veq_dist=veq_post,nsamples=nsamples)
     return samples
@@ -209,7 +207,10 @@ def all_cosi_samples(vsinis,veqs,dveqs,dvsinis=None,nsamples=100,vsini_upperlim=
                                     vsini_upperlim=vsini_upperlim)
     return samples
 
-def build_interpfn(ks=None,nz=100,return_vals=False,filename='cosi_pdf.h5',kmax=300):
+def build_interpfn(ks=None,nz=100,return_vals=False,filename='cosi_pdf_grid.h5',
+                   kmax=300, save=False):
+    """
+    """
     if ks is None:
         ks = np.concatenate((np.logspace(-2,0,100),np.linspace(1.1,kmax+1,300)))
 
@@ -226,10 +227,24 @@ def build_interpfn(ks=None,nz=100,return_vals=False,filename='cosi_pdf.h5',kmax=
             allzs[i] = z
             i += 1
     pts = np.array([allzs,allks]).T
+    if save:
+        df = pd.DataFrame({'z':allzs, 'k':allks, 'val': vals})
+        df.to_hdf(filename,'grid')
     if return_vals:
         return pts,vals
     else:
         return interpnd(pts,vals)
+
+#def cosi_pdf_fn(filename=resource_filename('data','cosi_pdf_grid.h5'),
+#                recalc=False,**kwargs):
+#    if recalc:
+#        return build_interpfn(**kwargs)
+#    else:
+#        df = pd.read_hdf(filename,'grid')
+#        pts = np.array([df['z'],df['k']]).T
+#        vals = np.array(df['val'])
+#        return interpnd(pts,vals)
+
 
 COSI_PDF_FN = build_interpfn()
 
@@ -259,7 +274,7 @@ def lnlike_twofisher(f,k1,k2,samples,prior=None):
     else:
         term1 = f*COSI_PDF_FN(samples.ravel(),k1)
         term2 = (1-f)*COSI_PDF_FN(samples.ravel(),k2)
-        print term1.shape,term2.shape
+        print(term1.shape,term2.shape)
         like = (f*COSI_PDF_FN(samples.ravel(),k1) + 
                 (1-f)*COSI_PDF_FN(samples.ravel(),k2)).reshape(samples.shape)
         return np.log(np.prod(np.sum(like,axis=1)/samples.shape[1])*prior(k1)*prior(k2))
@@ -322,7 +337,6 @@ def veq_samples(R_dist,Prot_dist,N=1e4,alpha=0.23,l0=20,sigl=20):
     Prots *= diff_Prot_factor(ls,alpha)
     return R_dist.rvs(N)*2*np.pi*RSUN/(Prots*DAY)/1e5 
 
-import distributions as dists
 
 #class Veq_Posterior_General(dists.DoubleGauss_Distribution):
 class Veq_Posterior_General(dists.KDE_Distribution):

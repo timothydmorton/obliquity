@@ -1,11 +1,12 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
+from Cython.Distutils import build_ext
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
-#ext_modules = [Extension('sini_inference_fns',['sini_inference_fns.pyx'])]
+sini_inference_fns = [Extension('sini_inference_fns',['obliquity/sini_inference_fns.pyx'])]
 
 setup(name = "obliquity",
       version = "0.1",
@@ -14,8 +15,10 @@ setup(name = "obliquity",
       author = "Timothy D. Morton",
       author_email = "tim.morton@gmail.com",
       url = "https://github.com/timothydmorton/obliquity",
-      packages = ['obliquity'],
-      ext_modules = cythonize(["obliquity/*.pyx"]),
+      packages = find_packages(),
+      #ext_modules = cythonize(["obliquity/*.pyx"]),
+      ext_modules = sini_inference_fns,
+      cmdclass = {'build_ext': build_ext},
       classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
@@ -24,6 +27,6 @@ setup(name = "obliquity",
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Astronomy'
         ],
-      install_requires=['cython','pandas','simpledist'],
+      install_requires=['cython','pandas>=0.13','simpledist'],
       zip_safe=False
 ) 
