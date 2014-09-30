@@ -326,31 +326,5 @@ class Veq_Posterior(object):
 
     pdf = __call__
 
-def diff_Prot_factor(l,alpha=0.23):
-    return (1 - alpha*(np.sin(np.deg2rad(l)))**2)
 
-def veq_samples(R_dist,Prot_dist,N=1e4,alpha=0.23,l0=20,sigl=20):
-    """Source for diff rot
-    """
-    ls = stats.norm(l0,sigl).rvs(N)
-    Prots = Prot_dist.rvs(N)
-    Prots *= diff_Prot_factor(ls,alpha)
-    return R_dist.rvs(N)*2*np.pi*RSUN/(Prots*DAY)/1e5 
-
-
-#class Veq_Posterior_General(dists.DoubleGauss_Distribution):
-class Veq_Posterior_General(dists.KDE_Distribution):
-    def __init__(self,R_dist,Prot_dist,N=1e4,alpha=0.23,l0=20,sigl=20,
-                 adaptive=False,bandwidth=0.03,**kwargs):
-        self.R_dist = R_dist
-        self.Prot_dist = Prot_dist
-        self.alpha = alpha
-        self.l0 = l0
-        self.sigl = sigl
-        veqs = veq_samples(R_dist,Prot_dist,N=N,alpha=alpha,l0=l0,sigl=sigl)
-        self.samples = veqs
-        dists.KDE_Distribution.__init__(self,veqs,adaptive=adaptive,bandwidth=0.03,
-                                        **kwargs)
-        #pars = dists.fit_doublegauss_samples(veqs,return_distribution=False)
-        #dists.DoubleGauss_Distribution.__init__(self,*pars)
 
