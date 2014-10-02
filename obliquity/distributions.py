@@ -1,6 +1,7 @@
 from __future__ import print_function,division
 import logging
 import numpy as np
+import pandas as pd
 
 import simpledist.distributions as dists
 import scipy.stats as stats
@@ -25,11 +26,11 @@ class Cosi_Distribution(dists.Distribution):
                  veq_bandwidth=0.03):
 
         if type(R_dist) in [type([]),type((1,))]:
-            R_dist = stats.norm(*R_dist)
+            R_dist = dists.Gaussian_Distribution(*R_dist)
         if type(Prot_dist) in [type([]),type((1,))]:
-            Prot_dist = stats.norm(*Prot_dist)
+            Prot_dist = dists.Gaussian_Distribution(*Prot_dist)
         if type(vsini_dist) in [type([]),type((1,))]:
-            vsini_dist = stats.norm(*vsini_dist)
+            vsini_dist = dists.Gaussian_Distribution(*vsini_dist)
 
         veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
                                     alpha=alpha,l0=l0,sigl=sigl,
@@ -46,6 +47,14 @@ class Cosi_Distribution(dists.Distribution):
         
         dists.Distribution.__init__(self,pdf,name='cos(I)',
                                     minval=0,maxval=1)
+
+    def save_hdf(self,filename,path='',**kwargs):
+        dists.Distribution.save_hdf(self,filename,path,**kwargs)
+        self.R_dist.save_hdf(filename,'{}/radius'.format(path))
+        self.Prot_dist.save_hdf(filename,'{}/Prot'.format(path))
+        self.vsini_dist.save_hdf(filename,'{}/vsini'.format(path))
+        self.veq_dist.save_hdf(filename,'{}/veq'.format(path))
+
 
 def diff_Prot_factor(l,alpha=0.23):
     return (1 - alpha*(np.sin(np.deg2rad(l)))**2)
@@ -69,7 +78,14 @@ class Veq_Distribution(dists.KDE_Distribution):
         self.sigl = sigl
         veqs = veq_samples(R_dist,Prot_dist,N=N,alpha=alpha,l0=l0,sigl=sigl)
         self.samples = veqs
+
         dists.KDE_Distribution.__init__(self,veqs,adaptive=adaptive,
                                         bandwidth=bandwidth,
                                         **kwargs)
-    
+    def save_hdf(self,filename,path='',**kwargs):
+        dists.KDE_Distribution.save_hdf(self,filename,path,**kwargs)
+        store = pd.HDFStore(filename)
+        store.get_storer('{}/fns'.format(path)).attrs.alpha = self.alpha
+        store.get_storer('{}/fns'.format(path)).attrs.l0 = self.l0
+        store.get_storer('{}/fns'.format(path)).attrs.sigl = self.sigl
+        store.close()
