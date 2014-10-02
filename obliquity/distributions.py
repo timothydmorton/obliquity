@@ -35,8 +35,6 @@ class Cosi_Distribution(dists.Distribution):
         veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
                                     alpha=alpha,l0=l0,sigl=sigl,
                                     bandwidth=veq_bandwidth)
-        self.R_dist = R_dist
-        self.Prot_dist = Prot_dist
         self.vsini_dist = vsini_dist
         self.veq_dist = veq_dist
 
@@ -53,6 +51,12 @@ class Cosi_Distribution(dists.Distribution):
         self.vsini_dist.save_hdf(filename,'{}/vsini'.format(path))
         self.veq_dist.save_hdf(filename,'{}/veq'.format(path))
 
+class Cosi_Distribution_FromH5(Cosi_Distribution,dists.Distribution_FromH5):
+    def __init__(self,filename,path='',**kwargs):
+        dists.Distribution_FromH5.__init__(self,filename,path,
+                                     **kwargs)
+        self.vsini_dist = dists.Distribution_FromH5(filename,'vsini')
+        self.veq_dist = Veq_Distribution_FromH5(filename,'veq')
 
 def diff_Prot_factor(l,alpha=0.23):
     return (1 - alpha*(np.sin(np.deg2rad(l)))**2)
@@ -82,18 +86,18 @@ class Veq_Distribution(dists.KDE_Distribution):
                                         **kwargs)
 
     def save_hdf(self,filename,path='',**kwargs):
-        dists.KDE_Distribution.save_hdf(self,filename,path,**kwargs)
-        store = pd.HDFStore(filename)
-        store.get_storer('{}/fns'.format(path)).attrs.alpha = self.alpha
-        store.get_storer('{}/fns'.format(path)).attrs.l0 = self.l0
-        store.get_storer('{}/fns'.format(path)).attrs.sigl = self.sigl
-        store.close()
+        keywords = {'alpha':self.alpha,
+                    'l0':self.l0,
+                    'sigl':self.sigl}
+        dists.KDE_Distribution.save_hdf(self,filename,path,
+                                        keywords=keywords,**kwargs)
+
         self.R_dist.save_hdf(filename,'{}/radius'.format(path))
         self.Prot_dist.save_hdf(filename,'{}/Prot'.format(path))
 
-
-#class Veq_Distribution_FromH5(Veq_Distribution):
-#    def __init__(self,filename,path='',**kwargs):
-#        
-#        Veq_Distribution.__init__(self,filename,path,**kwargs)
-        
+class Veq_Distribution_FromH5(Veq_Distribution,dists.Distribution_FromH5):
+    def __init__(self,filename,path='',**kwargs):
+        dists.Distribution_FromH5.__init__(self,filename,path,
+                                     **kwargs)
+        self.R_dist = dists.Distribution_FromH5(filename,'{}/radius'.format(path))
+        self.Prot_dist = dists.Distribution_FromH5(filename,'{}/Prot'.format(path))
