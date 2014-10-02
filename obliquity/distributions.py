@@ -50,8 +50,6 @@ class Cosi_Distribution(dists.Distribution):
 
     def save_hdf(self,filename,path='',**kwargs):
         dists.Distribution.save_hdf(self,filename,path,**kwargs)
-        self.R_dist.save_hdf(filename,'{}/radius'.format(path))
-        self.Prot_dist.save_hdf(filename,'{}/Prot'.format(path))
         self.vsini_dist.save_hdf(filename,'{}/vsini'.format(path))
         self.veq_dist.save_hdf(filename,'{}/veq'.format(path))
 
@@ -82,6 +80,7 @@ class Veq_Distribution(dists.KDE_Distribution):
         dists.KDE_Distribution.__init__(self,veqs,adaptive=adaptive,
                                         bandwidth=bandwidth,
                                         **kwargs)
+
     def save_hdf(self,filename,path='',**kwargs):
         dists.KDE_Distribution.save_hdf(self,filename,path,**kwargs)
         store = pd.HDFStore(filename)
@@ -89,3 +88,12 @@ class Veq_Distribution(dists.KDE_Distribution):
         store.get_storer('{}/fns'.format(path)).attrs.l0 = self.l0
         store.get_storer('{}/fns'.format(path)).attrs.sigl = self.sigl
         store.close()
+        self.R_dist.save_hdf(filename,'{}/radius'.format(path))
+        self.Prot_dist.save_hdf(filename,'{}/Prot'.format(path))
+
+
+#class Veq_Distribution_FromH5(Veq_Distribution):
+#    def __init__(self,filename,path='',**kwargs):
+#        
+#        Veq_Distribution.__init__(self,filename,path,**kwargs)
+        
