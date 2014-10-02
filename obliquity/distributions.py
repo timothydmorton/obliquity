@@ -26,11 +26,15 @@ class Cosi_Distribution(dists.Distribution):
                  veq_bandwidth=0.03):
 
         if type(R_dist) in [type([]),type((1,))]:
-            R_dist = dists.Gaussian_Distribution(*R_dist)
+            R_dist = dists.Gaussian_Distribution(R_dist[0],R_dist[1],name='radius')
         if type(Prot_dist) in [type([]),type((1,))]:
-            Prot_dist = dists.Gaussian_Distribution(*Prot_dist)
+            Prot_dist = dists.Gaussian_Distribution(Prot_dist[0],
+                                                    Prot_dist[1],
+                                                    name='Prot')
         if type(vsini_dist) in [type([]),type((1,))]:
-            vsini_dist = dists.Gaussian_Distribution(*vsini_dist)
+            vsini_dist = dists.Gaussian_Distribution(vsini_dist[0],
+                                                     vsini_dist[1],
+                                                     name='vsini')
 
         veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
                                     alpha=alpha,l0=l0,sigl=sigl,
@@ -82,16 +86,11 @@ class Veq_Distribution(dists.KDE_Distribution):
         self.samples = veqs
 
         dists.KDE_Distribution.__init__(self,veqs,adaptive=adaptive,
-                                        bandwidth=bandwidth,
+                                        bandwidth=bandwidth,name='v_eq',
                                         **kwargs)
 
     def save_hdf(self,filename,path='',**kwargs):
-        keywords = {'alpha':self.alpha,
-                    'l0':self.l0,
-                    'sigl':self.sigl}
-        dists.KDE_Distribution.save_hdf(self,filename,path,
-                                        keywords=keywords,**kwargs)
-
+        dists.KDE_Distribution.save_hdf(self,filename,path,**kwargs)
         self.R_dist.save_hdf(filename,'{}/radius'.format(path))
         self.Prot_dist.save_hdf(filename,'{}/Prot'.format(path))
 
