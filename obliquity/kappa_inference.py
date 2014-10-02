@@ -15,7 +15,7 @@ import pandas as pd
 from pkg_resources import resource_filename
 
 from sini_inference_fns import cosi_integrand
-from simpledist import distributions as dists
+#from simpledist import distributions as dists
 
 def fisher(x,k):
     """Fisher distribution 
@@ -126,26 +126,6 @@ def sample_posterior(x,post,nsamples=1):
     u = rand.random(size=nsamples)
     inds = np.digitize(u,cdf)
     return x[inds]
-    
-def cosi_samples(vsini=None,veq=None,dveq=None,dvsini=None,vsini_dist=None,veq_dist=None,
-                 nsamples=100,prior=None,vsini_upperlim=None,vsini_npts=1000):
-    """ Returns samples of the posterior of cosI, given VsinI, Veq, dVeq
-    """
-    if dvsini is not None or (vsini_dist is not None and veq_dist is not None):
-        if vsini_dist is None:
-            vsini_dist = stats.norm(loc=vsini,scale=dvsini)
-            if vsini < vsini_upperlim:
-                vsini_dist = stats.uniform(scale=vsini_upperlim)
-        else:
-            if vsini_dist.ppf(0.5) < vsini_upperlim:
-                vsini_dist = stats.uniform(scale=vsini_upperlim)
-        if veq_dist is None:
-            veq_dist = stats.norm(loc=veq,scale=dveq)
-        cs,post = cosi_posterior2(vsini_dist,veq_dist)
-    else:
-        cs,post = cosi_posterior(vsini,veq,dveq,prior=prior,vsini_upperlim=vsini_upperlim)
-    samples = sample_posterior(cs,post,nsamples)
-    return np.clip(samples,0,0.999) #hack to prevent nans later
 
 def kappa_prior(k):
     return (1+k**2)**(-3/4)
