@@ -7,7 +7,7 @@ import simpledist.distributions as dists
 import scipy.stats as stats
 from scipy.interpolate import UnivariateSpline as interpolate
 
-from .kappa_inference import cosi_posterior
+from .kappa_inference import cosi_posterior,sample_posterior
 
 from astropy import constants as const
 RSUN = const.R_sun.cgs.value
@@ -20,7 +20,7 @@ class Cosi_Distribution(dists.Distribution):
     Measurements may be passed as either (val,err) tuples/lists or 
     as `distribution` (or `stats.continuous`) objects
     """
-    def __init__(self,R_dist,Prot_dist,vsini_dist,
+    def __init__(self,R_dist,Prot_dist,vsini_dist,nsamples=1e3,
                  vgrid=None,npts=100,vgrid_pts=1000,
                  N_veq_samples=1e4,alpha=0.23,l0=20,sigl=20,
                  veq_bandwidth=0.03):
@@ -45,6 +45,7 @@ class Cosi_Distribution(dists.Distribution):
 
         cs,Ls = cosi_posterior(vsini_dist, veq_dist, vgrid=vgrid,
                              npts=npts, vgrid_pts=vgrid_pts)
+        self.samples = sample_posterior(cs,Ls,nsamples=nsamples)
         pdf = interpolate(cs,Ls,s=0)
         
         dists.Distribution.__init__(self,pdf,name='cos(I)',
