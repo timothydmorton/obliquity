@@ -1,12 +1,14 @@
 from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 from Cython.Distutils import build_ext
+import numpy
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
-sini_inference_fns = [Extension('sini_inference_fns',['obliquity/sini_inference_fns.pyx'])]
+sini_inference_fns = [Extension('sini_inference_fns',['obliquity/sini_inference_fns.pyx'],
+                                include_dirs=[numpy.get_include()])]
 
 setup(name = "obliquity",
       version = "0.1",
