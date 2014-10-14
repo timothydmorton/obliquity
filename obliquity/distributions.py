@@ -2,8 +2,10 @@ from __future__ import print_function,division
 import logging
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 import simpledist.distributions as dists
+from plotutils import setfig
 import scipy.stats as stats
 from scipy.interpolate import UnivariateSpline as interpolate
 
@@ -67,6 +69,30 @@ class Cosi_Distribution(dists.Distribution):
         dists.Distribution.save_hdf(self,filename,path,**kwargs)
         self.vsini_dist.save_hdf(filename,'{}/vsini'.format(path))
         self.veq_dist.save_hdf(filename,'{}/veq'.format(path))
+
+    def summary_plot(self,fig=None,title=''):
+        setfig(fig)
+        
+        ax1 = plt.subplot(221)
+        ax2 = plt.subplot(222)
+        ax3 = plt.subplot(223)
+
+        plt.sca(ax1)
+        self.plot(fig=0)
+        plt.sca(ax2)
+        self.veq_dist.R_dist.plot(fig=0)
+        plt.sca(ax3)
+        self.veq_dist.plot(fig=0,label='V_eq')
+        self.vsini_dist.plot(fig=0,label='VsinI')
+        #plt.legend()
+        plt.xlabel('Rotational Velocity [km/s]')
+
+        plt.annotate('$P = {:.2f}\pm{:.2f}$d'.format(self.veq_dist.Prot_dist.mu,
+                                                     self.veq_dist.Prot_dist.sig),
+                     xy=(0.6,0.3),xycoords='figure fraction',fontsize=24) 
+
+
+        plt.suptitle(title)
 
 class Cosi_Distribution_FromH5(Cosi_Distribution,dists.Distribution_FromH5):
     def __init__(self,filename,path='',**kwargs):

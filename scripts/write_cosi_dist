@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from __future__ import print_function
 from obliquity.distributions import Cosi_Distribution
+from simpledist import distributions as dists
 
 import argparse
 
+import matplotlib.pyplot as plt
 
 def main():
     parser = argparse.ArgumentParser(description='Calculate cosi distribution from provided Rstar, Prot, Vsini; write distribution to file')
@@ -19,17 +21,32 @@ def main():
     parser.add_argument('--alpha',default=0.23,help='differential rotation parameter')
     parser.add_argument('--l0',default=20,help='mean active lattitude for spots')
     parser.add_argument('--sigl',default=20,help='standard deviation on spot active lattitude distribution')
-    parser.add_argument('--vsini_corected',action='store_true',help='if this is set, then vsini will not be divided by 1 - (alpha/2)')
-    
+    parser.add_argument('--vsini_corrected',action='store_true',help='if this is set, then vsini will not be divided by 1 - (alpha/2)')
+    parser.add_argument('--vsini_upperlim',default=None,help='set if vsini measurement is just an upper limit.')
+    parser.add_argument('--plotfile',default=None,help='file in which to save cosI summary plot')
+    parser.add_argument('--plot_title',default='',help='title of plot')
 
     args = parser.parse_args()
 
-    cosi_dist = Cosi_Distribution(args.R,args.P,args.V,nsamples=args.nsamples,
+    if args.vsini_upperlim is None:
+        vsini_dist = args.V
+    else:
+        if not args.vsini_corrected:
+            upperlim = args.vsini_upperlim / (1 - args.alpha/2)
+        else:
+            upperlim = args.vsini_upperlim
+        vsini_dist = dists.Box_Distribution(0,upperlim)
+
+    cosi_dist = Cosi_Distribution(args.R,args.P,vsini_dist,nsamples=args.nsamples,
                                   N_veq_samples=args.N_veq_samples,
                                   veq_bandwidth=args.veq_bandwidth,
+                                  vsini_corrected=args.vsini_corrected,
                                   alpha=args.alpha,l0=args.l0,sigl=args.sigl)
     cosi_dist.save_hdf(args.filename)
 
+    if args.plotfile is not None:
+        cosi_dist.summary_plot(title=args.plot_title)
+        plt.savefig(args.plotfile)
 
 if __name__=='__main__':
     main()
