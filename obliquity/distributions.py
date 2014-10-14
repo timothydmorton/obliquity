@@ -19,9 +19,14 @@ class Cosi_Distribution(dists.Distribution):
 
     Measurements may be passed as either (val,err) tuples/lists or 
     as `distribution` (or `stats.continuous`) objects
+
+    if vsini_dist is passed as a tuple/list, and vsini_corrected is False,
+    then by default the value of vsini will be corrected by dividing by 
+    1 - (alpha/2), to correct for differential rotation, as in 
+    Hirano et al. (2013/14)
     """
     def __init__(self,R_dist,Prot_dist,vsini_dist,nsamples=1e3,
-                 vgrid=None,npts=100,vgrid_pts=1000,
+                 vgrid=None,npts=100,vgrid_pts=1000,vsini_corrected=False,
                  N_veq_samples=1e4,alpha=0.23,l0=20,sigl=20,
                  veq_bandwidth=0.03):
 
@@ -37,9 +42,11 @@ class Cosi_Distribution(dists.Distribution):
                                                     float(Prot_dist[1]),
                                                     name='Prot')
         if type(vsini_dist) in [type([]),type((1,))]:
-            vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
-                                                     float(vsini_dist[1]),
-                                                     name='vsini')
+            if not vsini_corrected:
+                vsini_dist[0] /= 1 - (alpha/2)
+                vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
+                                                         float(vsini_dist[1]),
+                                                         name='vsini')
 
         veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
                                     alpha=alpha,l0=l0,sigl=sigl,
