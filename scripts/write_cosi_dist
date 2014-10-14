@@ -32,9 +32,9 @@ def main():
         vsini_dist = args.V
     else:
         if not args.vsini_corrected:
-            upperlim = args.vsini_upperlim / (1 - args.alpha/2)
+            upperlim = float(args.vsini_upperlim) / (1 - float(args.alpha)/2)
         else:
-            upperlim = args.vsini_upperlim
+            upperlim = float(args.vsini_upperlim)
         vsini_dist = dists.Box_Distribution(0,upperlim)
 
     cosi_dist = Cosi_Distribution(args.R,args.P,vsini_dist,nsamples=args.nsamples,
