@@ -25,7 +25,9 @@ class Cosi_Distribution(dists.Distribution):
                  N_veq_samples=1e4,alpha=0.23,l0=20,sigl=20,
                  veq_bandwidth=0.03):
 
-        if type(R_dist) in [type([]),type((1,))]:
+        if type(R_dist) == type(''):
+            R_dist = dists.Distribution_FromH5(R_dist)
+        elif type(R_dist) in [type([]),type((1,))]:
             if len(R_dist)==2:
                 R_dist = dists.Gaussian_Distribution(R_dist[0],R_dist[1],name='radius')
             elif len(R_dist)==3:
