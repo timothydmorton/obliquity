@@ -20,6 +20,7 @@ setup(name = "obliquity",
       packages = find_packages(),
       #ext_modules = cythonize(["obliquity/*.pyx"]),
       ext_modules = sini_inference_fns,
+      scripts = ['scripts/write_cosi_dist'],
       cmdclass = {'build_ext': build_ext},
       classifiers=[
         'Development Status :: 3 - Alpha',

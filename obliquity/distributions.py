@@ -29,16 +29,16 @@ class Cosi_Distribution(dists.Distribution):
             R_dist = dists.Distribution_FromH5(R_dist)
         elif type(R_dist) in [type([]),type((1,))]:
             if len(R_dist)==2:
-                R_dist = dists.Gaussian_Distribution(R_dist[0],R_dist[1],name='radius')
+                R_dist = dists.Gaussian_Distribution(float(R_dist[0]),float(R_dist[1]),name='radius')
             elif len(R_dist)==3:
-                R_dist = dists.fit_doublegauss(R_dist[0],R_dist[1],R_dist[2],name='radius')
+                R_dist = dists.fit_doublegauss(float(R_dist[0]),float(R_dist[1]),float(R_dist[2]),name='radius')
         if type(Prot_dist) in [type([]),type((1,))]:
-            Prot_dist = dists.Gaussian_Distribution(Prot_dist[0],
-                                                    Prot_dist[1],
+            Prot_dist = dists.Gaussian_Distribution(float(Prot_dist[0]),
+                                                    float(Prot_dist[1]),
                                                     name='Prot')
         if type(vsini_dist) in [type([]),type((1,))]:
-            vsini_dist = dists.Gaussian_Distribution(vsini_dist[0],
-                                                     vsini_dist[1],
+            vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
+                                                     float(vsini_dist[1]),
                                                      name='vsini')
 
         veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,

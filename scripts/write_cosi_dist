@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+from __future__ import print_function
+from obliquity.distributions import Cosi_Distribution
+
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Calculate cosi distribution from provided Rstar, Prot, Vsini; write distribution to file')
+
+    parser.add_argument('filename',help='output filename (should end in .h5)')
+    parser.add_argument('-R',nargs='+',help='Radius distribution (can be .h5 file with saved distribution, R dR, or R dR- dR+')
+    parser.add_argument('-P',nargs='+',help='Prot distribution (can be .h5 file with saved distribution, P dP, or P dP- dP+')
+    parser.add_argument('-V',nargs='+',help='Vsini distribution (can be .h5 file with saved distribution, V dV, or V dV- dV+')
+
+    parser.add_argument('--nsamples',type=int,default=1000,help='number of cosi samples to save')
+    parser.add_argument('--N_veq_samples',type=int,default=1000,help='number of samples to use to sample v_eq distribution')
+    parser.add_argument('--veq_bandwidth',type=float,default=0.1,help='bandwidth for v_eq distribution KDE')
+    parser.add_argument('--alpha',default=0.23,help='differential rotation parameter')
+    parser.add_argument('--l0',default=20,help='mean active lattitude for spots')
+    parser.add_argument('--sigl',default=20,help='standard deviation on spot active lattitude distribution')
+    
+
+    args = parser.parse_args()
+
+    cosi_dist = Cosi_Distribution(args.R,args.P,args.V,nsamples=args.nsamples,
+                                  N_veq_samples=args.N_veq_samples,
+                                  veq_bandwidth=args.veq_bandwidth,
+                                  alpha=args.alpha,l0=args.l0,sigl=args.sigl)
+    cosi_dist.save_hdf(args.filename)
+
+
+if __name__=='__main__':
+    main()
