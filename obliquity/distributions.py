@@ -43,7 +43,7 @@ class Cosi_Distribution(dists.Distribution):
                                                     name='Prot')
         if type(vsini_dist) in [type([]),type((1,))]:
             if not vsini_corrected:
-                vsini_dist[0] /= 1 - (alpha/2)
+                vsini_dist[0] = float(vsini_dist[0])/(1 - (alpha/2))
                 vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
                                                          float(vsini_dist[1]),
                                                          name='vsini')
