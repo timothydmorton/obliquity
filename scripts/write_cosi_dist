@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--alpha',default=0.23,help='differential rotation parameter')
     parser.add_argument('--l0',default=20,help='mean active lattitude for spots')
     parser.add_argument('--sigl',default=20,help='standard deviation on spot active lattitude distribution')
+    parser.add_argument('--vsini_corected',action='store_true',help='if this is set, then vsini will not be divided by 1 - (alpha/2)')
     
 
     args = parser.parse_args()
