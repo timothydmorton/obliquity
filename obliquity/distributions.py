@@ -26,7 +26,10 @@ class Cosi_Distribution(dists.Distribution):
                  veq_bandwidth=0.03):
 
         if type(R_dist) in [type([]),type((1,))]:
-            R_dist = dists.Gaussian_Distribution(R_dist[0],R_dist[1],name='radius')
+            if len(R_dist)==2:
+                R_dist = dists.Gaussian_Distribution(R_dist[0],R_dist[1],name='radius')
+            elif len(R_dist)==3:
+                R_dist = dists.fit_doublegauss(R_dist[0],R_dist[1],R_dist[2],name='radius')
         if type(Prot_dist) in [type([]),type((1,))]:
             Prot_dist = dists.Gaussian_Distribution(Prot_dist[0],
                                                     Prot_dist[1],
@@ -101,3 +104,5 @@ class Veq_Distribution_FromH5(Veq_Distribution,dists.Distribution_FromH5):
                                      **kwargs)
         self.R_dist = dists.Distribution_FromH5(filename,'{}/radius'.format(path))
         self.Prot_dist = dists.Distribution_FromH5(filename,'{}/Prot'.format(path))
+
+
