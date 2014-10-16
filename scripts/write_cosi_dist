@@ -37,6 +37,9 @@ def main():
             upperlim = float(args.vsini_upperlim)
         vsini_dist = dists.Box_Distribution(0,upperlim)
 
+    if len(args.R)==1:
+        args.R = args.R[0]
+
     cosi_dist = Cosi_Distribution(args.R,args.P,vsini_dist,nsamples=args.nsamples,
                                   N_veq_samples=args.N_veq_samples,
                                   veq_bandwidth=args.veq_bandwidth,
