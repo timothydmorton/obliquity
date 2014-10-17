@@ -215,18 +215,22 @@ def build_interpfn(ks=None,nz=100,return_vals=False,filename='cosi_pdf_grid.h5',
     else:
         return interpnd(pts,vals)
 
-#def cosi_pdf_fn(filename=resource_filename('data','cosi_pdf_grid.h5'),
-#                recalc=False,**kwargs):
-#    if recalc:
-#        return build_interpfn(**kwargs)
-#    else:
-#        df = pd.read_hdf(filename,'grid')
-#        pts = np.array([df['z'],df['k']]).T
-#        vals = np.array(df['val'])
-#        return interpnd(pts,vals)
+def cosi_pdf_fn(filename=resource_filename('obliquity','data/cosi_pdf_grid.h5'),
+                recalc=False,**kwargs):
+    if recalc:
+        return build_interpfn(**kwargs)
+    else:
+        df = pd.read_hdf(filename,'grid')
+        pts = np.array([df['z'],df['k']]).T
+        vals = np.array(df['val'])
+        return interpnd(pts,vals)
 
+try:
+    COSI_PDF_FN = cosi_pdf_fn()
+except:
+    logging.warning('COSI_PDF_FN not created.  Run cosi_pdf_fn(save=True) and reload.') 
 
-COSI_PDF_FN = build_interpfn()
+#COSI_PDF_FN = build_interpfn()
 
 def lnlike_kappa(k,samples,prior=None):
     if prior is None:
@@ -281,6 +285,8 @@ def fveq(z,R,dR,P,dP):
          np.sqrt(2*pi)*(dR**2*P + dP**2*R*(z*1e5))*erf((dR**2*P + dP**2*R*(z*1e5)) *
                                                        (np.sqrt(2)*dP*dR*
                                                         np.sqrt(dR**2 + dP**2*(z*1e5)**2))))
+
+
 
 
 class Veq_Posterior(object):
