@@ -144,7 +144,7 @@ class Veq_Distribution_FromH5(Veq_Distribution,dists.Distribution_FromH5):
 
 
 def fveq(z,R,dR,P,dP):
-    """z=veq in km/s.  Breaks on errors < 6% for some numerical overflow reason
+    """z=veq in km/s.  
     """
 
     R *= 2*pi*RSUN
@@ -171,16 +171,13 @@ class Veq_Distribution_Simple(dists.Distribution):
     def __init__(self,R,dR,P,dP):
         self.R = R
         self.dR = dR
-        #if dR < 0.05*self.R:
-        #    self.dR = 0.05*self.R
-        #else:
-        #    self.dR = dR
+
         self.P = P
         self.dP = dP
-        #if dP < 0.05*self.P:
-        #    self.dP = 0.05*self.P
-        #else:
-        #    self.dP = dP
+
+        self.R_dist = dists.Gaussian_Distribution(R,dR)
+        self.Prot_dist = dists.Gaussian_Distribution(P,dP)
+
         self.veq_nominal = (RSUN*2*np.pi*self.R)/(self.P*DAY)/1e5
         self.e_veq_nominal = self.veq_nominal*(np.sqrt((self.dR/self.R)**2 +
                                                        (self.dP/self.P)**2))
