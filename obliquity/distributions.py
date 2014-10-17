@@ -8,6 +8,8 @@ import simpledist.distributions as dists
 from plotutils import setfig
 import scipy.stats as stats
 from scipy.interpolate import UnivariateSpline as interpolate
+from scipy.special import erf
+from numpy import pi
 
 from .kappa_inference import cosi_posterior,sample_posterior
 
@@ -140,4 +142,54 @@ class Veq_Distribution_FromH5(Veq_Distribution,dists.Distribution_FromH5):
         self.R_dist = dists.Distribution_FromH5(filename,'{}/radius'.format(path))
         self.Prot_dist = dists.Distribution_FromH5(filename,'{}/Prot'.format(path))
 
+
+def fveq(z,R,dR,P,dP):
+    """z=veq in km/s.  Breaks on errors < 6% for some numerical overflow reason
+    """
+
+    R *= 2*pi*RSUN
+    dR *= 2*pi*RSUN
+    P *= DAY
+    dP *= DAY
+
+    exp1 = -P**2/(2*dP**2) - R**2/(2*dR**2)
+    exp2 = (dR**2*P + dP**2*R*(z*1e5))**2/(2*dP**2*dR**2*(dR**2 + dP**2*(z*1e5)**2))
+
+    nonexp_term = 2*dP*dR*np.sqrt(dR**2 + dP**2*(z*1e5)**2)
+
+    return 1e5/(4*pi*(dR**2 + dP**2*(z*1e5)**2)**(3/2))*np.exp(exp1 + exp2) *\
+        (dR**2 * P*np.sqrt(2*pi) + 
+         dP**2 * np.sqrt(2*pi)*R*(z*1e5) + 
+         nonexp_term * np.exp(-exp2) +
+         np.sqrt(2*pi)*(dR**2*P + dP**2*R*(z*1e5))*erf((dR**2*P + dP**2*R*(z*1e5)) *
+                                                       (np.sqrt(2)*dP*dR*
+                                                        np.sqrt(dR**2 + dP**2*(z*1e5)**2))))
+
+
+
+class Veq_Distribution_Simple(dists.Distribution):
+    def __init__(self,R,dR,P,dP):
+        self.R = R
+        self.dR = dR
+        #if dR < 0.05*self.R:
+        #    self.dR = 0.05*self.R
+        #else:
+        #    self.dR = dR
+        self.P = P
+        self.dP = dP
+        #if dP < 0.05*self.P:
+        #    self.dP = 0.05*self.P
+        #else:
+        #    self.dP = dP
+        self.veq_nominal = (RSUN*2*np.pi*self.R)/(self.P*DAY)/1e5
+        self.e_veq_nominal = self.veq_nominal*(np.sqrt((self.dR/self.R)**2 +
+                                                       (self.dP/self.P)**2))
+        minveq = self.veq_nominal - 5*self.e_veq_nominal
+        maxveq = self.veq_nominal + 5*self.e_veq_nominal
+
+        def pdf(x):
+            return fveq(x,self.R,self.dR,self.P,self.dP)
+
+        dists.Distribution.__init__(self,pdf,name='Veq',
+                                    minval=minveq,maxval=maxveq)
 
