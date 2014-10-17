@@ -225,11 +225,7 @@ def cosi_pdf_fn(filename=resource_filename('obliquity','data/cosi_pdf_grid.h5'),
         vals = np.array(df['val'])
         return interpnd(pts,vals)
 
-try:
-    COSI_PDF_FN = cosi_pdf_fn()
-except:
-    logging.warning('COSI_PDF_FN not created.  Run cosi_pdf_fn(save=True) and reload.') 
-
+COSI_PDF_FN = cosi_pdf_fn()
 #COSI_PDF_FN = build_interpfn()
 
 def lnlike_kappa(k,samples,prior=None):
