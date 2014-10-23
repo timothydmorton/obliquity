@@ -83,6 +83,7 @@ class Cosi_Distribution(dists.Distribution):
         self.plot(fig=0)
         plt.sca(ax2)
         self.veq_dist.R_dist.plot(fig=0)
+        plt.xlim(xmin=0)
         plt.sca(ax3)
         self.veq_dist.plot(fig=0,label='V_eq')
         self.vsini_dist.plot(fig=0,label='VsinI')
