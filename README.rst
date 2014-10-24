@@ -2,7 +2,8 @@
 obliquity
 =========
 
-Infer the stellar obliquity distribution of transiting planet systems, following Morton & Winn (2014).
+Infer the stellar obliquity distribution of transiting planet systems, following `Morton & Winn (2014) <http://arxiv.org/abs/1408.6606>`_. 
+
 Makes use of the `simpledist <https://github.com/timothydmorton/simpledist>`_ package, which will be installed 
 as a dependency with installation of this package.
 
