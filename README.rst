@@ -6,6 +6,12 @@ Infer the stellar obliquity distribution of transiting planet systems, following
 Makes use of the `simpledist <https://github.com/timothydmorton/simpledist>`_ package, which will be installed 
 as a dependency with installation of this package.
 
+There are two main tasks this package does:
+
+1. Calculate posteriors of $\cos I_*$ given measurements of $R_*$, $P_{rot}$ and $V \sin I_*$.
+
+2. Infer the Fisher distribution parameter $\kappa$ given a sample of $\cos I_*$ posteriors.
+
 Installation
 ------------
 
@@ -50,6 +56,6 @@ After having done this, you could launch up python and read in the distribution 
     cosi_dist = Cosi_Distribution_FromH5('test.h5')
     cosi_dist.summary_plot()
 
-
+This is particularly useful for running batch jobs and doing more analysis later.
 
 
