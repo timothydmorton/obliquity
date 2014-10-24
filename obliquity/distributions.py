@@ -48,9 +48,9 @@ class Cosi_Distribution(dists.Distribution):
         if type(vsini_dist) in [type([]),type((1,))]:
             if not vsini_corrected:
                 vsini_dist[0] = float(vsini_dist[0])/(1 - (alpha/2))
-                vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
-                                                         float(vsini_dist[1]),
-                                                         name='vsini')
+            vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
+                                                     float(vsini_dist[1]),
+                                                     name='vsini')
 
         veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
                                     alpha=alpha,l0=l0,sigl=sigl,
