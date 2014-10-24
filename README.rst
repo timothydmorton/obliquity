@@ -6,10 +6,8 @@ Infer the stellar obliquity distribution of transiting planet systems, following
 Installation
 ------------
 
-Clone the repository and install
+::
 
-```
- git clone https://github.com/timothydmorton/obliquity.git
- cd obliquity
- python setup.py install [--user]
-```
+   pip install obliquity
+   
+
