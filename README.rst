@@ -12,6 +12,8 @@ There are two main tasks this package does:
 
 2. Infer the Fisher distribution parameter $\kappa$ given a sample of cos(I) posteriors.
 
+See below for a quick intro, and the `notebook demo <http://nbviewer.ipython.org/github/timothydmorton/obliquity/blob/master/notebooks/demo.ipynb>`_ for more.
+
 Installation
 ------------
 
