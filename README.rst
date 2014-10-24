@@ -40,7 +40,7 @@ file (`.h5` format that can be easily re-loaded back). e.g.,
 
     $ write_cosi_dist test.h5 -R 1.3 0.1 -P 14 0.3 -V 4 0.5
 
-After having done this, you could launch up python and do the following:
+After having done this, you could launch up python and read in the distribution as follows:
 
 .. code-block:: python
 
