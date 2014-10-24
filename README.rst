@@ -1,9 +1,11 @@
+=========
 obliquity
 =========
 
 Infer the stellar obliquity distribution of transiting planet systems, following Morton & Winn (2014).
 
-**Installation**
+Installation
+------------
 
 ::
 
@@ -17,7 +19,8 @@ Or clone the repository and install:
     $ cd obliquity
     $ python setup.py install [--user]
 
-**Basic usage**
+Basic usage
+-----------
 
 .. code-block:: python
 
