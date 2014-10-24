@@ -8,9 +8,9 @@ as a dependency with installation of this package.
 
 There are two main tasks this package does:
 
-1. Calculate posteriors of :math:`\cos I_*` given measurements of `$R_*$`, `$P_{rot}$` and `$V \sin I_*$`.
+1. Calculate posteriors of cos(I) given measurements of Rstar, Prot, Vsin(I).
 
-2. Infer the Fisher distribution parameter $\kappa$ given a sample of $\cos I_*$ posteriors.
+2. Infer the Fisher distribution parameter $\kappa$ given a sample of cos(I) posteriors.
 
 Installation
 ------------
