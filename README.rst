@@ -15,6 +15,6 @@ Or clone the repository and install:
 
     $ git clone https://github.com/timothydmorton/obliquity.git
     $ cd obliquity
-    $ python setup.py install --user
+    $ python setup.py install [--user]
 
 
