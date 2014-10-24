@@ -28,11 +28,18 @@ Basic usage
     cosi_dist = Cosi_Distribution((1.3,0.1),(15,0.3),(3.5,0.5)) #Radius, Prot, VsinI
     cosi_dist.summary_plot()
 
-**Command-line scripts**
+Command-line scripts
+--------------------
 
 In addition to the ``obliquity`` module, this package also installs a few command-line scripts.  
 
 ``write_cosi_dist``: This calculates a ``Cosi_Distribution`` given input parameters, and writes the distribution to 
-file (`.h5` format that can be easily re-loaded back).
+file (`.h5` format that can be easily re-loaded back). e.g.,
+
+::
+
+    $ write_cosi_dist test.h5 -R 1.3 0.1 -P 14 0.3 -V 4 0.5
+
+
 
 
