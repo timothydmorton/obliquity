@@ -31,30 +31,39 @@ class Cosi_Distribution(dists.Distribution):
     """
     def __init__(self,R_dist,Prot_dist,vsini_dist,nsamples=1e3,
                  vgrid=None,npts=100,vgrid_pts=1000,vsini_corrected=False,
-                 N_veq_samples=1e4,alpha=0.23,l0=20,sigl=20,
-                 veq_bandwidth=0.03):
+                 veq_simple=False,
+                 N_veq_samples=1e3,alpha=0.23,l0=20,sigl=20,
+                 veq_bandwidth=0.1):
 
         if type(R_dist) == type(''):
             R_dist = dists.Distribution_FromH5(R_dist,'radius')
         elif type(R_dist) in [type([]),type((1,))]:
             if len(R_dist)==2:
-                R_dist = dists.Gaussian_Distribution(float(R_dist[0]),float(R_dist[1]),name='radius')
+                R,dR = R_dist
+                R=float(R); dR=float(dR)
+                R_dist = dists.Gaussian_Distribution(R,dR,name='radius')
             elif len(R_dist)==3:
                 R_dist = dists.fit_doublegauss(float(R_dist[0]),float(R_dist[1]),float(R_dist[2]),name='radius')
         if type(Prot_dist) in [type([]),type((1,))]:
-            Prot_dist = dists.Gaussian_Distribution(float(Prot_dist[0]),
-                                                    float(Prot_dist[1]),
-                                                    name='Prot')
+            P,dP = Prot_dist
+            P=float(P); dP=float(dP)
+            Prot_dist = dists.Gaussian_Distribution(P,dP,name='Prot')
         if type(vsini_dist) in [type([]),type((1,))]:
+            vsini,dvsini = vsini_dist
+            vsini=float(vsini); dvsini=float(dvsini)
             if not vsini_corrected:
-                vsini_dist[0] = float(vsini_dist[0])/(1 - (alpha/2))
-            vsini_dist = dists.Gaussian_Distribution(float(vsini_dist[0]),
-                                                     float(vsini_dist[1]),
-                                                     name='vsini')
+                vsini = float(vsini)/(1 - (alpha/2))
+            vsini_dist = dists.Gaussian_Distribution(vsini,dvsini,name='vsini')
+        if vsini_dist.minval < 0:
+            vsini_dist.minval = 0
 
-        veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
-                                    alpha=alpha,l0=l0,sigl=sigl,
-                                    bandwidth=veq_bandwidth)
+
+        if veq_simple:
+            veq_dist = Veq_Distribution_Simple(R,dR,P,dP)
+        else:
+            veq_dist = Veq_Distribution(R_dist,Prot_dist,N=N_veq_samples,
+                                        alpha=alpha,l0=l0,sigl=sigl,
+                                        bandwidth=veq_bandwidth)
         self.vsini_dist = vsini_dist
         self.veq_dist = veq_dist
 
@@ -81,18 +90,25 @@ class Cosi_Distribution(dists.Distribution):
 
         plt.sca(ax1)
         self.plot(fig=0)
+        plt.yticks([])
+        plt.xlabel('Cos(I)',labelpad=2)
         plt.sca(ax2)
         self.veq_dist.R_dist.plot(fig=0)
+        plt.yticks([])
+        plt.xlabel('Stellar Raidus',labelpad=2)
         plt.xlim(xmin=0)
         plt.sca(ax3)
         self.veq_dist.plot(fig=0,label='V_eq')
+        plt.yticks([])
         self.vsini_dist.plot(fig=0,label='VsinI')
         #plt.legend()
         plt.xlabel('Rotational Velocity [km/s]')
 
+        plt.subplots_adjust(hspace=.4)
+
         plt.annotate('$P = {:.2f}\pm{:.2f}$d'.format(self.veq_dist.Prot_dist.mu,
                                                      self.veq_dist.Prot_dist.sig),
-                     xy=(0.6,0.3),xycoords='figure fraction',fontsize=24) 
+                     xy=(0.5,0.3),xycoords='figure fraction',fontsize=24) 
 
 
         plt.suptitle(title)
@@ -142,7 +158,8 @@ class Veq_Distribution_FromH5(Veq_Distribution,dists.Distribution_FromH5):
                                      **kwargs)
         self.R_dist = dists.Distribution_FromH5(filename,'{}/radius'.format(path))
         self.Prot_dist = dists.Distribution_FromH5(filename,'{}/Prot'.format(path))
-
+        if self.minval < 0:
+            self.minval = 0
 
 def fveq(z,R,dR,P,dP):
     """z=veq in km/s.  
@@ -165,8 +182,6 @@ def fveq(z,R,dR,P,dP):
          np.sqrt(2*pi)*(dR**2*P + dP**2*R*(z*1e5))*erf((dR**2*P + dP**2*R*(z*1e5)) *
                                                        (np.sqrt(2)*dP*dR*
                                                         np.sqrt(dR**2 + dP**2*(z*1e5)**2))))
-
-
 
 class Veq_Distribution_Simple(dists.Distribution):
     def __init__(self,R,dR,P,dP):
@@ -191,3 +206,5 @@ class Veq_Distribution_Simple(dists.Distribution):
         dists.Distribution.__init__(self,pdf,name='Veq',
                                     minval=minveq,maxval=maxveq)
 
+        if self.minval < 0:
+            self.minval=0
