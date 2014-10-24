@@ -52,9 +52,9 @@ After having done this, you could launch up python and read in the distribution 
 
 .. code-block:: python
 
-    >>> from obliquity import Cosi_Distribution_FromH5
-    >>> cosi_dist = Cosi_Distribution_FromH5('test.h5')
-    >>> cosi_dist.summary_plot()
+    from obliquity import Cosi_Distribution_FromH5
+    cosi_dist = Cosi_Distribution_FromH5('test.h5')
+    cosi_dist.summary_plot()
 
 This is particularly useful for running batch jobs and doing more analysis later.
 
