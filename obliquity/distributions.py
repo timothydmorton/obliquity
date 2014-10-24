@@ -103,6 +103,12 @@ class Cosi_Distribution(dists.Distribution):
         self.vsini_dist.plot(fig=0,label='VsinI')
         #plt.legend()
         plt.xlabel('Rotational Velocity [km/s]')
+        plt.annotate('Veq',xy=(0.05,0.8),color='b',
+                     xycoords='axes fraction',
+                     fontsize=14)
+        plt.annotate('VsinI',xy=(0.05,0.67),color='g',
+                     xycoords='axes fraction',
+                     fontsize=14)
 
         plt.subplots_adjust(hspace=.4)
 
