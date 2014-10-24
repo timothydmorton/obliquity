@@ -40,6 +40,14 @@ file (`.h5` format that can be easily re-loaded back). e.g.,
 
     $ write_cosi_dist test.h5 -R 1.3 0.1 -P 14 0.3 -V 4 0.5
 
+After having done this, you could launch up python and do the following:
+
+.. code-block:: python
+
+    from obliquities import Cosi_Distribution_FromH5
+    cosi_dist = Cosi_Distribution_FromH5('test.h5')
+    cosi_dist.summary_plot()
+
 
 
 
