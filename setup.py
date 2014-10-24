@@ -11,7 +11,7 @@ sini_inference_fns = [Extension('sini_inference_fns',['obliquity/sini_inference_
                                 include_dirs=[numpy.get_include()])]
 
 setup(name = "obliquity",
-      version = "0.1",
+      version = "0.2",
       description = "Infer the stellar obliquity distribution of transiting planet systems.",
       long_description = readme(),
       author = "Timothy D. Morton",
