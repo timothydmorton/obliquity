@@ -42,10 +42,14 @@ Basic usage
 Command-line scripts
 --------------------
 
-In addition to the ``obliquity`` module, this package also installs a few command-line scripts.  
+In addition to the ``obliquity`` module, this package also installs a few command-line scripts:  
 
-``write_cosi_dist``: This calculates a ``Cosi_Distribution`` given input parameters, and writes the distribution to 
+-``write_cosi_dist``: This calculates a ``Cosi_Distribution`` given input parameters, and writes the distribution to 
 file (`.h5` format that can be easily re-loaded back). e.g.,
+-``calc_kappa_posterior``: Calculates the $kappa$ posterior for a sample defined by a given list of cos(I) posteriors.
+
+
+Some example usage: 
 
 ::
 
@@ -59,6 +63,6 @@ After having done this, you could launch up python and read in the distribution 
     cosi_dist = Cosi_Distribution_FromH5('test.h5')
     cosi_dist.summary_plot()
 
-This is particularly useful for running batch jobs and doing more analysis later.
+This is particularly useful for running batch jobs and doing more analysis later; for example, you may make a number of .h5 files in this manner, and then analyze them together using ``calc_kappa_posterior``.
 
 
