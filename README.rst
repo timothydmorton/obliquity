@@ -44,8 +44,7 @@ Command-line scripts
 
 In addition to the ``obliquity`` module, this package also installs a few command-line scripts:  
 
-- ``write_cosi_dist``: This calculates a ``Cosi_Distribution`` given input parameters, and writes the distribution to 
-file (`.h5` format that can be easily re-loaded back). e.g.,
+- ``write_cosi_dist``: This calculates a ``Cosi_Distribution`` given input parameters, and writes the distribution to file (`.h5` format that can be easily re-loaded back). e.g.,
 - ``calc_kappa_posterior``: Calculates the $kappa$ posterior for a sample defined by a given list of cos(I) posteriors.
 
 
