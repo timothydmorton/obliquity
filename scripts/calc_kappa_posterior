@@ -30,6 +30,8 @@ def main():
         print('{} of {}'.format(i+1,len(files)))
         try:
             dist = Cosi_Distribution_FromH5(f)
+            if np.isnan(dist.norm):
+                raise RuntimeError
             if len(dist.samples) != args.nsamples:
                 inds = rand.randint(len(dist.samples),size=args.nsamples)
                 all_samples[i,:] = dist.samples[inds]

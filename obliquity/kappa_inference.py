@@ -243,6 +243,22 @@ def kappa_posterior(samples,kmin=0.01,kmax=100,npts=200):
     post = np.exp(lnlikes)
     return ks,post/np.trapz(post,ks)
 
+def isotropic_cos(c):
+    return np.ones_like(c)
+
+def lnlike_mixture(f,k,samples,prior=None):
+    if prior is None:
+        prior = kappa_prior
+    if f < 0 or f > 1:
+        return -np.inf
+    else:
+        term1 = f*isotropic_cos(samples.ravel()) # kappa=0 for fraction f of systems
+        term2 = (1-f)*COSI_PDF_FN(samples.ravel(),k)
+        print(term1.shape,term2.shape)
+        like = (f*isotropic_cos(samples.ravel()) + 
+                (1-f)*COSI_PDF_FN(samples.ravel(),k)).reshape(samples.shape)
+        return np.log(np.prod(np.sum(like,axis=1)/samples.shape[1])*prior(k))
+    
 
 def lnlike_twofisher(f,k1,k2,samples,prior=None):
     if prior is None:
