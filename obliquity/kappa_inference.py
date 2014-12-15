@@ -228,6 +228,7 @@ def cosi_pdf_fn(filename=resource_filename('obliquity','data/cosi_pdf_grid.h5'),
 COSI_PDF_FN = cosi_pdf_fn()
 #COSI_PDF_FN = build_interpfn()
 
+
 def lnlike_kappa(k,samples,prior=None):
     if prior is None:
         prior = kappa_prior
@@ -242,6 +243,20 @@ def kappa_posterior(samples,kmin=0.01,kmax=100,npts=200):
         lnlikes[i] = lnlike_kappa(k,samples)
     post = np.exp(lnlikes)
     return ks,post/np.trapz(post,ks)
+
+def trapz2d(L,x,y):
+	return trapz(trapz(L,y,axis=0),x)
+
+def mixture_kappa_posterior(samples,kmin=0.01,kmax=100,npts_k=100,
+                            npts_f=50):
+    ks = np.linspace(kmin,kmax,npts_k)
+    fs = np.linspace(0,1,npts_f)
+    lnlikes = np.zeros((npts_f,npts_k))
+    for i,f in enumerate(fs):
+        for j,k in enumerate(ks):
+            lnlikes[i,j] = lnlike_mixture(f,k,samples)
+    post = np.exp(lnlikes)
+    return ks,fs,post/np.trapz2d(post,fs,ks)
 
 def isotropic_cos(c):
     return np.ones_like(c)
