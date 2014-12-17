@@ -134,8 +134,11 @@ def sample_posterior(x,post,nsamples=1):
     inds = np.digitize(u,cdf)
     return x[inds]
 
-def kappa_prior(k):
-    return (1+k**2)**(-3/4)
+def kappa_prior(k,kmin=0.01,kmax=100):
+    def fn(x):
+        return (1+x**2)**(-3/4)
+    norm = quad(fn,kmin,kmax)[0]
+    return fn(k) / norm
 
 def uniform_samples_from_kappa_prior(kmin,kmax,n,res=1e4):
     ks = np.linspace(kmin,kmax,res)
@@ -236,23 +239,25 @@ COSI_PDF_FN = cosi_pdf_fn()
 #COSI_PDF_FN = build_interpfn()
 
 
-def lnlike_kappa(k,samples,prior=None):
+def lnlike_kappa(k,samples,prior=None,kmin=0.01,kmax=100):
     if prior is None:
         prior = kappa_prior
+    samples[samples > 0.9999] = 0.9999
     like = COSI_PDF_FN(samples.ravel(),k).reshape(samples.shape)
-    return np.log(np.prod(np.sum(like,axis=1)/samples.shape[1])*prior(k))
+    return np.log(np.prod(np.sum(like,axis=1)/samples.shape[1])*prior(k,kmin,kmax))
                   
 def kappa_posterior(samples,kmin=0.01,kmax=100,npts=200):
     #ks = uniform_samples_from_kappa_prior(kmin,kmax,npts)
     ks = np.linspace(kmin,kmax,npts)
     lnlikes = ks*0
     for i,k in enumerate(ks):
-        lnlikes[i] = lnlike_kappa(k,samples)
+        lnlikes[i] = lnlike_kappa(k,samples,kmin=kmin,kmax=kmax)
+        #logging.debug('k={:.2f}, lnlike={:.2f}'.format(k,lnlikes[i]))
     post = np.exp(lnlikes)
     return ks,post/np.trapz(post,ks)
 
 def trapz2d(L,x,y):
-	return trapz(trapz(L,y,axis=0),x)
+	return np.trapz(np.trapz(L,y,axis=0),x)
 
 def mixture_kappa_posterior(samples,kmin=0.01,kmax=100,npts_k=100,
                             npts_f=50):
