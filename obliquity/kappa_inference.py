@@ -258,7 +258,7 @@ class lnlike_worker(object):
         self.kwargs = kwargs
 
     def __call__(self, k):
-        return lnlike_kappa(k, **kwargs)
+        return lnlike_kappa(k, **self.kwargs)
 
 def kappa_posterior(samples, kmin=0.01, kmax=200, npts=300, pool=None, **kwargs):
     #ks = uniform_samples_from_kappa_prior(kmin,kmax,npts)
