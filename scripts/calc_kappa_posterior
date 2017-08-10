@@ -14,8 +14,10 @@ def main():
     
     parser.add_argument('filename',help='file with list of .h5 files containing Cos(I) distributions (one filename per line)')
     parser.add_argument('--nsamples',default=1000,type=int,help='number of samples to draw from each distribution')
+    parser.add_argument('--nk', default=500, type=int, help='number of kappa values to sample')
     parser.add_argument('--kmin',default=0.01,type=float,help='minimum value of kappa to calculate.')
     parser.add_argument('--kmax',default=200,type=float,help='maximum value of kappa to calculate.')
+    parser.add_argument('--exact', action='store_true', help='use exact integration instead of interpolation')
     parser.add_argument('--npoints',default=300,type=int,help='number of kappa points to calculate posterior')
     parser.add_argument('--savefile',default=None,help='.h5 file to which to save distribution.  By default, just the filename argument with _kappa.h5 appended.')
 
@@ -46,7 +48,8 @@ def main():
     all_samples = np.delete(all_samples,bad_inds,axis=0)
 
     ks,post = ki.kappa_posterior(all_samples,kmin=args.kmin,
-                                 kmax=args.kmax,npts=args.npoints)
+                                 kmax=args.kmax,npts=args.npoints,
+                                 nk=args.nk, use_interp=(not args.exact))
 
     dist = dists.Empirical_Distribution(ks,post,name='kappa')
 

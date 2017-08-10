@@ -239,20 +239,23 @@ COSI_PDF_FN = cosi_pdf_fn()
 #COSI_PDF_FN = build_interpfn()
 
 
-def lnlike_kappa(k,samples,prior=None, kmin=0.01,kmax=100):
+def lnlike_kappa(k,samples,prior=None, kmin=0.01,kmax=100, fn=None,
+                    use_interp=True):
+    if fn is None:
+        fn = COSI_PDF_FN
     if prior is None:
         prior = kappa_prior
     samples[samples > 0.9999] = 0.9999
-    like = COSI_PDF_FN(samples.ravel(),k).reshape(samples.shape)
+    if use_interp:
+        like = COSI_PDF_FN(samples.ravel(),k).reshape(samples.shape)
+    else:
+        like = np.array([cosi_pdf(z,k) for z in samples.ravel()]).reshape(samples.shape)
     return np.log(np.prod(np.sum(like,axis=1)/samples.shape[1])*prior(k,kmin,kmax))
                   
-def kappa_posterior(samples,kmin=0.01,kmax=100,npts=200):
+def kappa_posterior(samples, **kwargs):
     #ks = uniform_samples_from_kappa_prior(kmin,kmax,npts)
     ks = np.linspace(kmin,kmax,npts)
-    lnlikes = ks*0
-    for i,k in enumerate(ks):
-        lnlikes[i] = lnlike_kappa(k,samples,kmin=kmin,kmax=kmax)
-        #logging.debug('k={:.2f}, lnlike={:.2f}'.format(k,lnlikes[i]))
+    lnlikes = np.array([lnlike_kappa(k, samples, **kwargs) for k in ks])
     post = np.exp(lnlikes)
     return ks,post/np.trapz(post,ks)
 
