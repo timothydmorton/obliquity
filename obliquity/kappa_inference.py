@@ -198,11 +198,11 @@ def all_cosi_samples(vsinis,veqs,dveqs,dvsinis=None,nsamples=100,vsini_upperlim=
     return samples
 
 def build_interpfn(ks=None,nz=100,return_vals=False,filename='cosi_pdf_grid.h5',
-                   kmax=300, save=False):
+                   kmax=300, save=False, nk=400):
     """
     """
     if ks is None:
-        ks = np.concatenate((np.logspace(-2,0,100),np.linspace(1.1,kmax+1,300)))
+        ks = np.concatenate((np.logspace(-2,0,100),np.linspace(1.1,kmax+1,nk-100)))
 
     nk = len(ks)
     zs = np.linspace(0,0.9999,nz)
@@ -239,7 +239,7 @@ COSI_PDF_FN = cosi_pdf_fn()
 #COSI_PDF_FN = build_interpfn()
 
 
-def lnlike_kappa(k,samples,prior=None,kmin=0.01,kmax=100):
+def lnlike_kappa(k,samples,prior=None, kmin=0.01,kmax=100):
     if prior is None:
         prior = kappa_prior
     samples[samples > 0.9999] = 0.9999
