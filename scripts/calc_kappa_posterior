@@ -48,7 +48,7 @@ def main():
 
     ks,post = ki.kappa_posterior(all_samples,kmin=args.kmin,
                                  kmax=args.kmax,npts=args.npoints,
-                                 npts=args.npts, use_interp=(not args.exact))
+                                 use_interp=(not args.exact))
 
     dist = dists.Empirical_Distribution(ks,post,name='kappa')
 
