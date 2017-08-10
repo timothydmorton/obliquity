@@ -9,6 +9,8 @@ from obliquity import kappa_inference as ki
 from obliquity.distributions import Cosi_Distribution_FromH5
 from simpledist import distributions as dists
 
+import schwimmbad
+
 def main():
     parser = argparse.ArgumentParser(description='Calculate kappa posterior based on Cos(I) samples provided in file')
     
@@ -20,7 +22,14 @@ def main():
     parser.add_argument('--npoints',default=300,type=int,help='number of kappa points to calculate posterior')
     parser.add_argument('--savefile',default=None,help='.h5 file to which to save distribution.  By default, just the filename argument with _kappa.h5 appended.')
 
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--ncores", dest="n_cores", default=1,
+                       type=int, help="Number of processes (uses multiprocessing).")
+    group.add_argument("--mpi", dest="mpi", default=False,
+                       action="store_true", help="Run with MPI.")
     args = parser.parse_args()
+
+    pool = schwimmbad.choose_pool(mpi=args.mpi, processes=args.n_cores)
 
     files = np.loadtxt(args.filename,dtype=str)
 
@@ -48,7 +57,7 @@ def main():
 
     ks,post = ki.kappa_posterior(all_samples,kmin=args.kmin,
                                  kmax=args.kmax,npts=args.npoints,
-                                 use_interp=(not args.exact))
+                                 use_interp=(not args.exact), pool=pool)
 
     dist = dists.Empirical_Distribution(ks,post,name='kappa')
 

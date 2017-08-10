@@ -252,10 +252,22 @@ def lnlike_kappa(k,samples,prior=None, kmin=0.01,kmax=100, fn=None,
         like = np.array([cosi_pdf(z,k) for z in samples.ravel()]).reshape(samples.shape)
     return np.log(np.prod(np.sum(like,axis=1)/samples.shape[1])*prior(k,kmin,kmax))
                   
-def kappa_posterior(samples, kmin=0.01, kmax=200, npts=300, **kwargs):
+
+class lnlike_worker(object):
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
+    def __call__(self, k):
+        return lnlike_kappa(k, **kwargs)
+
+def kappa_posterior(samples, kmin=0.01, kmax=200, npts=300, pool=None, **kwargs):
     #ks = uniform_samples_from_kappa_prior(kmin,kmax,npts)
     ks = np.linspace(kmin,kmax,npts)
-    lnlikes = np.array([lnlike_kappa(k, samples, kmin=kmin, kmax=kmax, **kwargs) for k in ks])
+    if pool is not None:
+        worker = lnlike_worker(samples=samples, kmin=kmin, kmax=kmax, **kwargs)
+        lnlikes = pool.map(worker, ks)
+    else:
+        lnlikes = np.array([lnlike_kappa(k, samples, kmin=kmin, kmax=kmax, **kwargs) for k in ks])
     post = np.exp(lnlikes)
     return ks,post/np.trapz(post,ks)
 
